@@ -29,6 +29,7 @@
   "bugs": {
     "url": "https://github.com/steve228uk/reactotron-mcp/issues"
   },
+  "license": "MIT",
   "type": "module",
   "files": ["dist"],
   "bin": {
