@@ -1,10 +1,33 @@
 {
   "name": "reactotron-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An MCP server for Reactotron. Read logs, query state, run custom commands.",
+  "keywords": [
+    "reactotron",
+    "mcp",
+    "model-context-protocol",
+    "react",
+    "react-native",
+    "debugging",
+    "devtools",
+    "websocket",
+    "claude",
+    "cursor",
+    "ai",
+    "llm",
+    "agent"
+  ],
   "author": {
     "name": "Stephen Radford",
     "url": "https://github.com/steve228uk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/steve228uk/reactotron-mcp.git"
+  },
+  "homepage": "https://github.com/steve228uk/reactotron-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/steve228uk/reactotron-mcp/issues"
   },
   "type": "module",
   "files": ["dist"],
