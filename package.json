@@ -1,0 +1,30 @@
+{
+  "name": "reactotron-mcp",
+  "version": "0.1.0",
+  "description": "An MCP server for Reactotron. Read logs, query state, run custom commands.",
+  "author": {
+    "name": "Stephen Radford",
+    "url": "https://github.com/steve228uk"
+  },
+  "type": "module",
+  "files": ["dist"],
+  "bin": {
+    "reactotron-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --outfile dist/index.js --target node --banner '#!/usr/bin/env node' && chmod +x dist/index.js",
+    "dev": "bun run src/index.ts",
+    "start": "bun run src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "ws": "^8.18.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.0",
+    "typescript": "^5.7.0"
+  }
+}

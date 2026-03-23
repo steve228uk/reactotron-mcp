@@ -1,0 +1,52 @@
+export interface ReactotronMessage {
+  type: string
+  payload?: unknown
+  important?: boolean
+  date?: string
+  deltaTime?: number
+  connectionId?: number
+  clientId?: string
+  messageId?: number
+}
+
+export interface LogPayload {
+  level: "debug" | "warn" | "error"
+  message: unknown
+  stack?: string
+}
+
+export interface ApiResponsePayload {
+  duration: number
+  request: {
+    data?: unknown
+    headers?: Record<string, string>
+    method: string
+    params?: unknown
+    url: string
+  }
+  response: {
+    body?: unknown
+    headers?: Record<string, string>
+    status: number
+  }
+}
+
+export interface StateKeysResponsePayload {
+  path: string
+  keys: string[]
+  valid: boolean
+}
+
+export interface StateValuesResponsePayload {
+  path: string
+  value: unknown
+  valid: boolean
+}
+
+export interface CustomCommandRegistration {
+  id: string | number
+  command: string
+  title?: string
+  description?: string
+  args?: Array<{ name: string; type?: string }>
+}
