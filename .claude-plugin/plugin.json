@@ -1,0 +1,11 @@
+{
+  "name": "reactotron-mcp",
+  "description": "Read logs, inspect state, monitor network requests, and run custom commands in your React or React Native app via Reactotron.",
+  "version": "0.1.1",
+  "author": {
+    "name": "Stephen Radford",
+    "url": "https://github.com/steve228uk"
+  },
+  "homepage": "https://github.com/steve228uk/reactotron-mcp",
+  "repository": "https://github.com/steve228uk/reactotron-mcp"
+}
