@@ -12,6 +12,11 @@ import { registerGetStateActions } from "./tools/get-state-actions.js"
 import { registerGetStateChanges } from "./tools/get-state-changes.js"
 import { registerGetBenchmarks } from "./tools/get-benchmarks.js"
 import { registerClearMessages } from "./tools/clear-messages.js"
+import { registerListCustomCommands } from "./tools/list-custom-commands.js"
+import { registerGetConnectionStatus } from "./tools/get-connection-status.js"
+import { registerDebugAppPrompt } from "./prompts/debug-app.js"
+import { registerTraceActionPrompt } from "./prompts/trace-action.js"
+import { registerDiagnoseNetworkPrompt } from "./prompts/diagnose-network.js"
 import { registerLogsResource } from "./resources/logs.js"
 import { registerNetworkResource } from "./resources/network.js"
 import { registerTimelineResource } from "./resources/timeline.js"
@@ -42,6 +47,12 @@ registerGetStateActions(server, store)
 registerGetStateChanges(server, store)
 registerGetBenchmarks(server, store)
 registerClearMessages(server, store)
+registerListCustomCommands(server, store)
+registerGetConnectionStatus(server, proxy)
+
+registerDebugAppPrompt(server)
+registerTraceActionPrompt(server)
+registerDiagnoseNetworkPrompt(server)
 
 registerLogsResource(server, store)
 registerNetworkResource(server, store)
