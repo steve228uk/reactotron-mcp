@@ -12,6 +12,10 @@ import { registerGetStateActions } from "./tools/get-state-actions.js"
 import { registerGetStateChanges } from "./tools/get-state-changes.js"
 import { registerGetBenchmarks } from "./tools/get-benchmarks.js"
 import { registerClearMessages } from "./tools/clear-messages.js"
+import { registerLogsResource } from "./resources/logs.js"
+import { registerNetworkResource } from "./resources/network.js"
+import { registerTimelineResource } from "./resources/timeline.js"
+import { registerStateResource } from "./resources/state.js"
 
 const reactotronPort = parseInt(process.env.REACTOTRON_PORT ?? "9090", 10)
 const proxyPort = parseInt(process.env.REACTOTRON_PROXY_PORT ?? "9091", 10)
@@ -35,6 +39,11 @@ registerGetStateActions(server, store)
 registerGetStateChanges(server, store)
 registerGetBenchmarks(server, store)
 registerClearMessages(server, store)
+
+registerLogsResource(server, store)
+registerNetworkResource(server, store)
+registerTimelineResource(server, store)
+registerStateResource(server, proxy)
 
 const transport = new StdioServerTransport()
 await server.connect(transport)
