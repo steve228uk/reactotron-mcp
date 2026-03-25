@@ -14,9 +14,14 @@ import { registerGetBenchmarks } from "./tools/get-benchmarks.js"
 import { registerClearMessages } from "./tools/clear-messages.js"
 import { registerListCustomCommands } from "./tools/list-custom-commands.js"
 import { registerGetConnectionStatus } from "./tools/get-connection-status.js"
+import { registerGetDisplays } from "./tools/get-displays.js"
+import { registerGetAppInfo } from "./tools/get-app-info.js"
+import { registerGetErrors } from "./tools/get-errors.js"
 import { registerDebugAppPrompt } from "./prompts/debug-app.js"
 import { registerTraceActionPrompt } from "./prompts/trace-action.js"
 import { registerDiagnoseNetworkPrompt } from "./prompts/diagnose-network.js"
+import { registerDebugPerformancePrompt } from "./prompts/debug-performance.js"
+import { registerDebugErrorsPrompt } from "./prompts/debug-errors.js"
 import { registerLogsResource } from "./resources/logs.js"
 import { registerNetworkResource } from "./resources/network.js"
 import { registerTimelineResource } from "./resources/timeline.js"
@@ -24,6 +29,9 @@ import { registerStateResource } from "./resources/state.js"
 import { registerStateActionsResource } from "./resources/state-actions.js"
 import { registerStateChangesResource } from "./resources/state-changes.js"
 import { registerBenchmarksResource } from "./resources/benchmarks.js"
+import { registerDisplaysResource } from "./resources/displays.js"
+import { registerCustomCommandsResource } from "./resources/custom-commands.js"
+import { registerConnectionResource } from "./resources/connection.js"
 
 const reactotronPort = parseInt(process.env.REACTOTRON_PORT ?? "9090", 10)
 const proxyPort = parseInt(process.env.REACTOTRON_PROXY_PORT ?? "9091", 10)
@@ -48,11 +56,16 @@ registerGetStateChanges(server, store)
 registerGetBenchmarks(server, store)
 registerClearMessages(server, store)
 registerListCustomCommands(server, store)
-registerGetConnectionStatus(server, proxy)
+registerGetConnectionStatus(server, proxy, store)
+registerGetDisplays(server, store)
+registerGetAppInfo(server, store)
+registerGetErrors(server, store)
 
 registerDebugAppPrompt(server)
 registerTraceActionPrompt(server)
 registerDiagnoseNetworkPrompt(server)
+registerDebugPerformancePrompt(server)
+registerDebugErrorsPrompt(server)
 
 registerLogsResource(server, store)
 registerNetworkResource(server, store)
@@ -61,6 +74,9 @@ registerStateResource(server, proxy)
 registerStateActionsResource(server, store)
 registerStateChangesResource(server, store)
 registerBenchmarksResource(server, store)
+registerDisplaysResource(server, store)
+registerCustomCommandsResource(server, store)
+registerConnectionResource(server, proxy, store)
 
 const transport = new StdioServerTransport()
 await server.connect(transport)

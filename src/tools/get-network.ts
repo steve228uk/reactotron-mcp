@@ -9,11 +9,13 @@ export function registerGetNetwork(server: McpServer, store: MessageStore): void
     "Retrieve captured API/network requests and responses from the app.",
     {
       url: z.string().optional().describe("Filter by URL substring"),
+      method: z.string().optional().describe("Filter by HTTP method (GET, POST, etc.)"),
       status: z.number().int().optional().describe("Filter by HTTP status code"),
+      minDuration: z.number().optional().describe("Only return requests slower than this many milliseconds"),
       limit: z.number().int().positive().optional().describe("Max entries to return (default 50)"),
     },
-    ({ url, status, limit }) => {
-      const items = store.getNetwork({ url, status, limit })
+    ({ url, method, status, minDuration, limit }) => {
+      const items = store.getNetwork({ url, method, status, minDuration, limit })
 
       if (items.length === 0) {
         return {

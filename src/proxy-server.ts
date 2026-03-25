@@ -115,6 +115,7 @@ export class ProxyServer {
   private pendingValues: PendingQuery | null = null
 
   connected = false
+  readonly proxyPort: number
 
   constructor(
     store: MessageStore,
@@ -129,8 +130,9 @@ export class ProxyServer {
     this.reactotronHost = opts.reactotronHost ?? "localhost"
     this.reactotronPort = opts.reactotronPort ?? 9090
     this.timeout = opts.timeout ?? 5000
+    this.proxyPort = opts.proxyPort ?? 9091
 
-    this.wss = new WebSocketServer({ port: opts.proxyPort ?? 9091 })
+    this.wss = new WebSocketServer({ port: this.proxyPort })
 
     this.wss.on("connection", (appSocket) => {
       this.activeConnection?.close()

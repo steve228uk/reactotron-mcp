@@ -1,4 +1,4 @@
-import type { ReactotronMessage, LogPayload, ApiResponsePayload, CustomCommandRegistration, StateActionCompletePayload, StateValuesChangePayload, BenchmarkReportPayload } from "./types.js"
+import type { ReactotronMessage, LogPayload, ApiResponsePayload, CustomCommandRegistration, StateActionCompletePayload, StateValuesChangePayload, BenchmarkReportPayload, ClientIntroPayload } from "./types.js"
 
 const MAX_BUFFER = 1000
 
@@ -28,8 +28,10 @@ export class MessageStore {
   stateActions: ReactotronMessage[] = []
   stateChanges: ReactotronMessage[] = []
   benchmarks: ReactotronMessage[] = []
+  displays: ReactotronMessage[] = []
   timeline: ReactotronMessage[] = []
   customCommands = new Map<string, CustomCommandRegistration>()
+  clientInfo: ClientIntroPayload | null = null
 
   ingest(raw: ReactotronMessage): void {
     const msg: ReactotronMessage = {
@@ -54,6 +56,12 @@ export class MessageStore {
         break
       case "benchmark.report":
         addToBuffer(this.benchmarks, msg)
+        break
+      case "display":
+        addToBuffer(this.displays, msg)
+        break
+      case "client.intro":
+        this.clientInfo = msg.payload as ClientIntroPayload
         break
       case "customCommand.register": {
         const reg = msg.payload as CustomCommandRegistration
@@ -83,7 +91,7 @@ export class MessageStore {
     return items.slice(-(opts.limit ?? 50))
   }
 
-  getNetwork(opts: { url?: string; status?: number; limit?: number } = {}): ReactotronMessage[] {
+  getNetwork(opts: { url?: string; method?: string; status?: number; minDuration?: number; limit?: number } = {}): ReactotronMessage[] {
     let items = this.apiResponses
     if (opts.url) {
       const q = opts.url.toLowerCase()
@@ -92,10 +100,24 @@ export class MessageStore {
         return payload?.request?.url?.toLowerCase().includes(q)
       })
     }
+    if (opts.method) {
+      const m = opts.method.toUpperCase()
+      items = items.filter((msg) => {
+        const payload = msg.payload as ApiResponsePayload
+        return payload?.request?.method?.toUpperCase() === m
+      })
+    }
     if (opts.status !== undefined) {
       items = items.filter((m) => {
         const payload = m.payload as ApiResponsePayload
         return payload?.response?.status === opts.status
+      })
+    }
+    if (opts.minDuration !== undefined) {
+      const min = opts.minDuration
+      items = items.filter((m) => {
+        const payload = m.payload as ApiResponsePayload
+        return (payload?.duration ?? 0) >= min
       })
     }
     return items.slice(-(opts.limit ?? 50))
@@ -120,6 +142,21 @@ export class MessageStore {
       items = items.filter((m) => {
         const payload = m.payload as StateValuesChangePayload
         return payload?.changes?.some((c) => c.path?.toLowerCase().includes(q))
+      })
+    }
+    return items.slice(-(opts.limit ?? 50))
+  }
+
+  getDisplays(opts: { search?: string; limit?: number } = {}): ReactotronMessage[] {
+    let items = this.displays
+    if (opts.search) {
+      const q = opts.search.toLowerCase()
+      items = items.filter((m) => {
+        const payload = m.payload as { name?: string; preview?: string }
+        return (
+          payload?.name?.toLowerCase().includes(q) ||
+          payload?.preview?.toLowerCase().includes(q)
+        )
       })
     }
     return items.slice(-(opts.limit ?? 50))
@@ -153,6 +190,7 @@ export class MessageStore {
       this.stateActions = []
       this.stateChanges = []
       this.benchmarks = []
+      this.displays = []
       this.timeline = []
       return count
     }
@@ -162,6 +200,7 @@ export class MessageStore {
       "state.action.complete": this.stateActions,
       "state.values.change": this.stateChanges,
       "benchmark.report": this.benchmarks,
+      display: this.displays,
     }
     const buffer = buffers[type]
     if (!buffer) return 0

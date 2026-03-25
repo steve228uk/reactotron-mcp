@@ -73,3 +73,19 @@ export interface BenchmarkReportPayload {
     time: number
   }>
 }
+
+export interface DisplayPayload {
+  name: string
+  value?: unknown
+  preview?: string
+  important?: boolean
+}
+
+export interface ClientIntroPayload {
+  name?: string
+  version?: string
+  platform?: string
+  reactNativeVersion?: string
+  reactVersion?: string
+  [key: string]: unknown
+}
