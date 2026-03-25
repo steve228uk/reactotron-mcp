@@ -80,3 +80,12 @@ registerConnectionResource(server, proxy, store)
 
 const transport = new StdioServerTransport()
 await server.connect(transport)
+
+// Notify subscribed clients whenever a resource has new data.
+// sendResourceUpdated is on the underlying Server instance; errors are silently
+// swallowed because the client may not be subscribed or may have disconnected.
+store.onUpdate = (uris) => {
+  for (const uri of uris) {
+    server.server.sendResourceUpdated({ uri }).catch(() => undefined)
+  }
+}
