@@ -19,10 +19,12 @@ App ──► MCP Proxy (port 9091) ──► Reactotron (port 9090)
 
 Your app connects to the proxy instead of directly to Reactotron. The proxy forwards all traffic to Reactotron (so the desktop UI works normally) and captures every message for the MCP tools.
 
+The proxy works in **standalone mode** — if Reactotron is not open, the app connection is kept alive and all messages are still captured. When Reactotron is opened later, the proxy reconnects automatically (with exponential backoff). This means you don't need to have Reactotron running before starting your app.
+
 ## Requirements
 
-- [Reactotron](https://github.com/infinitered/reactotron) desktop app running
 - Your app pointed at the proxy port (default `9091`) instead of Reactotron directly
+- [Reactotron](https://github.com/infinitered/reactotron) desktop app (optional — for the visual UI)
 
 ## Installation
 

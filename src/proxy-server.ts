@@ -2,6 +2,8 @@ import { WebSocket, WebSocketServer } from "ws"
 import type { MessageStore } from "./message-store.js"
 import type { ReactotronMessage } from "./types.js"
 
+const RECONNECT_DELAYS_MS = [1000, 2000, 4000, 8000, 16000]
+
 type PendingQuery = {
   resolve: (value: unknown) => void
   reject: (reason: unknown) => void
@@ -23,8 +25,16 @@ class Mutex {
 class ProxyConnection {
   private appSocket: WebSocket
   private upstream: WebSocket | null = null
+  private readonly reactotronHost: string
+  private readonly reactotronPort: number
   private readonly onMessage: (msg: ReactotronMessage) => void
   private readonly onClose: () => void
+  private reconnectAttempt = 0
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  private closed = false
+
+  /** True when the upstream Reactotron desktop connection is open */
+  reactotronConnected = false
 
   constructor(
     appSocket: WebSocket,
@@ -34,10 +44,12 @@ class ProxyConnection {
     onClose: () => void,
   ) {
     this.appSocket = appSocket
+    this.reactotronHost = reactotronHost
+    this.reactotronPort = reactotronPort
     this.onMessage = onMessage
     this.onClose = onClose
 
-    this._connectUpstream(reactotronHost, reactotronPort)
+    this._connectUpstream()
 
     appSocket.on("message", (data) => {
       const raw = data.toString()
@@ -52,6 +64,8 @@ class ProxyConnection {
     })
 
     appSocket.on("close", () => {
+      this.closed = true
+      this._cancelReconnect()
       this.upstream?.close()
       this.onClose()
     })
@@ -61,9 +75,17 @@ class ProxyConnection {
     })
   }
 
-  private _connectUpstream(host: string, port: number): void {
-    const upstream = new WebSocket(`ws://${host}:${port}`)
+  private _connectUpstream(): void {
+    if (this.closed) return
+
+    const upstream = new WebSocket(`ws://${this.reactotronHost}:${this.reactotronPort}`)
     this.upstream = upstream
+    this.reactotronConnected = false
+
+    upstream.on("open", () => {
+      this.reactotronConnected = true
+      this.reconnectAttempt = 0
+    })
 
     upstream.on("message", (data) => {
       const raw = data.toString()
@@ -78,12 +100,31 @@ class ProxyConnection {
     })
 
     upstream.on("close", () => {
-      this.appSocket.close()
+      this.reactotronConnected = false
+      // Keep the app socket alive and schedule a reconnect to Reactotron
+      this._scheduleReconnect()
     })
 
     upstream.on("error", () => {
-      // error always followed by close
+      // error always followed by close; reconnect is handled there
     })
+  }
+
+  private _scheduleReconnect(): void {
+    if (this.closed) return
+    const delay = RECONNECT_DELAYS_MS[Math.min(this.reconnectAttempt, RECONNECT_DELAYS_MS.length - 1)]
+    this.reconnectAttempt++
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null
+      this._connectUpstream()
+    }, delay)
+  }
+
+  private _cancelReconnect(): void {
+    if (this.reconnectTimer !== null) {
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
+    }
   }
 
   sendToApp(msg: Partial<ReactotronMessage>): void {
@@ -99,6 +140,8 @@ class ProxyConnection {
   }
 
   close(): void {
+    this.closed = true
+    this._cancelReconnect()
     this.appSocket.close()
   }
 }
