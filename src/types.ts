@@ -10,7 +10,7 @@ export interface ReactotronMessage {
 }
 
 export interface LogPayload {
-  level: "debug" | "warn" | "error"
+  level: "log" | "debug" | "warn" | "error"
   message: unknown
   stack?: string
 }

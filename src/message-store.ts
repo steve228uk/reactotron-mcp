@@ -167,6 +167,7 @@ export class MessageStore {
     if (!buffer) return 0
     const count = buffer.length
     buffer.length = 0
+    this.timeline = this.timeline.filter((m) => m.type !== type)
     return count
   }
 }

@@ -9,7 +9,7 @@ export function registerGetLogs(server: McpServer, store: MessageStore): void {
     "Retrieve log messages captured from the connected React/React Native app via Reactotron.",
     {
       level: z
-        .enum(["debug", "warn", "error"])
+        .enum(["log", "debug", "warn", "error"])
         .optional()
         .describe("Filter by log level"),
       search: z.string().optional().describe("Substring search in log message text"),
